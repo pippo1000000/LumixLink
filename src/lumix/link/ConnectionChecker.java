@@ -23,7 +23,7 @@ public class ConnectionChecker implements Runnable {
     public void run() {
         while(true) {      
         try {
-            if(!this.isReachable("192.168.54.1", 80, 500)) {
+            if(!this.isReachable("192.168.54.1", 80, 2000)) {
                 s.stop();
                 this.againOnline = true;
                 System.out.println("Offline!");
