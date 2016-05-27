@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 public class ConnectionChecker implements Runnable {
     private UDPServer s;
     private boolean againOnline=false;
+    boolean toto = true;
     
     public ConnectionChecker(UDPServer s) {
         this.s = s;
@@ -21,19 +22,19 @@ public class ConnectionChecker implements Runnable {
     
     @Override
     public void run() {
-        while(true) {      
+        toto=true;
+        while(toto) {      
         try {
-            if(!this.isReachable("192.168.54.1", 80, 2000)) {
-                s.stop();
+            if(!this.isReachable("192.168.54.1", 80, 1300)) {
                 this.againOnline = true;
-                System.out.println("Offline!");
             }
             else if (this.againOnline) {
+                s.stop();
                 Request.recMode(); 
                 Request.startStream();
                 new Thread(s).start();
                 this.againOnline = false;
-                System.out.println("Online Again!");
+                GUI.appendMessage("Connessione al dispositivo ristabilita");
             }              
         } catch (UnknownHostException ex) {
                 s.stop();
@@ -43,6 +44,10 @@ public class ConnectionChecker implements Runnable {
                 Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+    
+    public void stop(){
+        toto = false;
     }
     
     static boolean isReachable(String addr, int openPort, int timeOutMillis) {

@@ -17,7 +17,7 @@ public class Dispatcher implements KeyEventDispatcher {
             if (e.getKeyCode() == KeyEvent.VK_ESCAPE){
                 try {
                     Request.stopStream();
-                    System.exit(0);
+                    GUI.closePanel();
                 } catch (IOException ex) {
                     Logger.getLogger(Dispatcher.class.getName()).log(Level.SEVERE, null, ex);
                 }

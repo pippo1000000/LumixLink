@@ -10,8 +10,6 @@ public class LumixLink  {
      */
     public static void main(String[] args) throws IOException, InterruptedException
     {
-        KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-        manager.addKeyEventDispatcher(new Dispatcher());
         GUI gui = new GUI();
         gui.setVisible(true);
     }       

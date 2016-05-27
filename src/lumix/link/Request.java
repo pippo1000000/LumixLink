@@ -24,35 +24,35 @@ public class Request {
     public static String recMode() throws MalformedURLException, IOException{
         Request.url = new URL("http://192.168.54.1/cam.cgi?mode=camcmd&value=recmode");
         Request.connection = (HttpURLConnection) url.openConnection();
-        String responseCode = "" + connection.getResponseCode();
-        return responseCode;
+        String responseMessage = connection.getResponseMessage();
+        return responseMessage;
     }
     
     public static String startStream() throws MalformedURLException, IOException{
         Request.url = new URL("http://192.168.54.1/cam.cgi?mode=startstream&value=49199");
         Request.connection = (HttpURLConnection) url.openConnection();
-        String responseCode = "" + connection.getResponseCode();
-        return responseCode;
+        String responseMessage = connection.getResponseMessage();
+        return responseMessage;
     }
     
-    public static void getState() throws MalformedURLException, IOException{
+    public static String getState() throws MalformedURLException, IOException{
         Request.url = new URL("http://192.168.54.1/cam.cgi?mode=getstate");
         Request.connection = (HttpURLConnection) url.openConnection();
-        int responseCode = connection.getResponseCode();
-        System.out.println(responseCode);
+        String responseMessage = connection.getResponseMessage();
+        return responseMessage;
     }
     
-    public static void stopStream() throws MalformedURLException, IOException{
+    public static String stopStream() throws MalformedURLException, IOException{
         Request.url = new URL("http://192.168.54.1/cam.cgi?mode=stopstream");
         Request.connection = (HttpURLConnection) url.openConnection();
-        int responseCode = connection.getResponseCode();
-        System.out.println(responseCode);
+        String responseMessage = connection.getResponseMessage();
+        return responseMessage;
     }
     
     public static String capture() throws MalformedURLException, IOException{
         Request.url = new URL("http://192.168.54.1/cam.cgi?mode=camcmd&value=capture");
         Request.connection = (HttpURLConnection) url.openConnection();
-        String responseCode = "" + connection.getResponseCode();
-        return responseCode;
+        String responseMessage = connection.getResponseMessage();
+        return responseMessage;
     }
 }

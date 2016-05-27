@@ -33,7 +33,7 @@ public class UDPServer extends JPanel implements Runnable {
     public void paint(Graphics g) {
 
         if ( bufferedImage != null ){
-            g.drawImage(bufferedImage, 0, 0, getWidth(), (getWidth()*9/16), this);
+            g.drawImage(bufferedImage, 0, 35, getWidth(), (getWidth()*9/16), this);
         }
     }
     private void initSocket(){

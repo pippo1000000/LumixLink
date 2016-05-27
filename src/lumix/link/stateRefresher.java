@@ -14,14 +14,15 @@ import java.util.logging.Logger;
  * @author chnedev
  */
 public class stateRefresher implements Runnable {
-
+    boolean toto = true;
+    
     @Override
     public void run() {
-        while(true){
+        toto=true;
+        while(toto){
             try {
                 Thread.sleep(10000);
-                Request.getState();
-                System.out.println("Requesting state!");
+                GUI.appendMessage("Aggiornamento dello stato del dispositivo. Risposta: " + Request.getState());
             } catch (InterruptedException ex) {
                 Logger.getLogger(stateRefresher.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -29,6 +30,10 @@ public class stateRefresher implements Runnable {
             }
             
         }
+    }
+    
+    public void stop(){
+        toto=false;
     }
     
 }
