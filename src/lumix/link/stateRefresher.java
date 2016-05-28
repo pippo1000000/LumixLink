@@ -24,7 +24,7 @@ public class stateRefresher implements Runnable {
                 Thread.sleep(10000);
                 GUI.appendMessage("Aggiornamento dello stato del dispositivo. Risposta: " + Request.getState());
             } catch (InterruptedException ex) {
-                Logger.getLogger(stateRefresher.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Connessione assente");
             } catch (IOException ex) {
                 Logger.getLogger(stateRefresher.class.getName()).log(Level.SEVERE, null, ex);
             }
