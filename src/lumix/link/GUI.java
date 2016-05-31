@@ -5,13 +5,10 @@
  */
 package lumix.link;
 
-import java.awt.BorderLayout;
 import static java.awt.Color.BLACK;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -28,6 +25,11 @@ public class GUI extends javax.swing.JFrame  {
     static Thread theServer;
     static Thread checker;
     static Thread stateRefresh;
+
+    static void doit() {
+        jButton2.setEnabled(true);
+    }
+    boolean started = false;
     
     /**
      * Creates new form GUI
@@ -50,12 +52,24 @@ public class GUI extends javax.swing.JFrame  {
         jTextArea1.setCaretPosition(jTextArea1.getDocument().getLength());
     }
     
-    public static void closePanel(){
+    public static void stop(){
         frame.setVisible(false);
         serv.stop();
         connection.stop();
         refresh.stop();
-        GUI.appendMessage("Chiusura dei thread avviata; ultima esecuzione dei cicli:");
+        GUI.appendMessage("Chiusura dei thread avviata;");
+    }
+    
+    public static void start(){
+        theServer = new Thread(serv);
+        checker = new Thread(connection);
+        stateRefresh = new Thread(refresh);
+        theServer.start();
+        checker.start();
+        stateRefresh.start();
+        GUI.appendMessage("Streaming UDP dal dispositivo avviato. Risposta: " + Request.startStream());
+        imagePanel.add(serv);
+        frame.setVisible(true);
     }
     
     /**
@@ -73,10 +87,13 @@ public class GUI extends javax.swing.JFrame  {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jLabel1 = new javax.swing.JLabel();
+        jButton4 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(0, 0, 0));
         setResizable(false);
 
+        jButton1.setBackground(new java.awt.Color(204, 204, 204));
         jButton1.setText("Esegui connessione");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -84,6 +101,7 @@ public class GUI extends javax.swing.JFrame  {
             }
         });
 
+        jButton2.setBackground(new java.awt.Color(204, 204, 204));
         jButton2.setText("Avvia lo stream");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -91,6 +109,7 @@ public class GUI extends javax.swing.JFrame  {
             }
         });
 
+        jButton3.setBackground(new java.awt.Color(204, 204, 204));
         jButton3.setText("Cattura immagine");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -102,13 +121,24 @@ public class GUI extends javax.swing.JFrame  {
         jScrollPane1.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 
         jTextArea1.setEditable(false);
+        jTextArea1.setBackground(new java.awt.Color(0, 0, 0));
         jTextArea1.setColumns(20);
+        jTextArea1.setForeground(new java.awt.Color(51, 204, 0));
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
         jTextArea1.setName(""); // NOI18N
         jScrollPane1.setViewportView(jTextArea1);
 
         jLabel1.setText("Lumix Link - Controllo connessione con videocamera Panasonic GH4");
+        jLabel1.setToolTipText("");
+
+        jButton4.setBackground(new java.awt.Color(204, 204, 204));
+        jButton4.setText("Ferma lo stream");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -117,14 +147,15 @@ public class GUI extends javax.swing.JFrame  {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 511, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 447, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 511, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 447, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -136,11 +167,14 @@ public class GUI extends javax.swing.JFrame  {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 79, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jButton4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 115, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
 
@@ -149,40 +183,32 @@ public class GUI extends javax.swing.JFrame  {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try {
-            GUI.appendMessage("Connessione al dispositivo eseguita. Risposta: " + Request.recMode());
-            stateRefresh = new Thread(refresh);
-            stateRefresh.start();
-        } catch (IOException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        if(started){
+            GUI.stop();
+            started = false;
+            jButton2.setEnabled(false);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        GUI.appendMessage("Cattura immagine avviata. Risposta: " + Request.capture());
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        try {
-            theServer = new Thread(serv);
-            checker = new Thread(connection);
-            checker.start();
-            Request.startStream();
-            imagePanel.add(serv);
-            frame.setVisible(true);
-            theServer.start();
-        } catch (IOException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
+        if(!started){
+            GUI.start();
+            started = true;
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        try {
-            jTextArea1.append(Request.capture() + "\n");
-        } catch (IOException ex) {
-            Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        GUI.appendMessage("Connessione al dispositivo eseguita. Risposta: " + Request.recMode());
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
+     * @throws java.io.IOException
      */
     public static void main(String args[]) throws IOException{
         /* Set the Nimbus look and feel */
@@ -210,13 +236,14 @@ public class GUI extends javax.swing.JFrame  {
 
         /* Create and display the form */
         
-        new GUI().setVisible(true);
+        new GUI().setVisible(true);   
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    static javax.swing.JButton jButton1;
+    static javax.swing.JButton jButton2;
+    static javax.swing.JButton jButton3;
+    static javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private static javax.swing.JTextArea jTextArea1;

@@ -7,12 +7,11 @@ package lumix.link;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ConnectionChecker implements Runnable {
-    private UDPServer s;
+    private final UDPServer s;
     private boolean againOnline=false;
     boolean toto = true;
     
@@ -24,8 +23,7 @@ public class ConnectionChecker implements Runnable {
     public void run() {
         toto=true;
         while(toto) {      
-        try {
-            if(!this.isReachable("192.168.54.1", 80, 1300)) {
+            if(!this.isReachable("192.168.54.1", 80, 1000)) {
                 this.againOnline = true;
             }
             else if (this.againOnline) {
@@ -35,13 +33,11 @@ public class ConnectionChecker implements Runnable {
                 new Thread(s).start();
                 this.againOnline = false;
                 GUI.appendMessage("Connessione al dispositivo ristabilita");
-            }              
-        } catch (UnknownHostException ex) {
-                s.stop();
-                Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                s.stop();
-                Logger.getLogger(UDPServer.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ConnectionChecker.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -56,7 +52,7 @@ public class ConnectionChecker implements Runnable {
         try {
             try (Socket soc = new Socket()) {
                 soc.connect(new InetSocketAddress(addr, openPort), timeOutMillis);
-            }
+                }
             return true;
         } catch (IOException ex) {
             return false;

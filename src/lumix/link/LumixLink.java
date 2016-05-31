@@ -1,5 +1,4 @@
 package lumix.link;
-import java.awt.KeyboardFocusManager;
 import java.io.IOException;
 
 public class LumixLink  {  
